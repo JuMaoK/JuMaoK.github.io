@@ -6,7 +6,7 @@
     <title>0/1 Knapsack problem - Chase</title>
     <meta name="author"  content="Chase">
     <meta name="description" content="0/1 Knapsack problem">
-    <meta name="keywords"  content="算法">
+    <meta name="keywords"  content="Algorithms">
     <!-- Open Graph -->
     <meta property="og:title" content="0/1 Knapsack problem - Chase">
     <meta property="og:type" content="website">
@@ -116,7 +116,7 @@ Author: Ray-Eldath
       <div class="post-tags">
         
           
-            <a href="http://localhost:4000/tags#%E7%AE%97%E6%B3%95" class="post-tag">算法</a>
+            <a href="http://localhost:4000/tags#Algorithms" class="post-tag">Algorithms</a>
           
         
       </div>
@@ -169,13 +169,13 @@ Author: Ray-Eldath
   <li>使总价值v最大化</li>
 </ol>
 
-<p>maximize \(\sum_{i=1}^{n}vixi \)</p>
+<p>maximize <script type="math/tex">\sum_{i=1}^{n}vixi</script></p>
 
 <ol>
   <li>总重量小于W</li>
 </ol>
 
-<p>subject to \(\sum_{i=1}^{n}wixi \leq W\) and  \(xi \in {0,1}\)</p>
+<p>subject to <script type="math/tex">\sum_{i=1}^{n}wixi \leq W</script> and <script type="math/tex">xi \in {0,1}</script></p>
 
 <p>更为复杂的有bounded knapsack problem (BKP)和unbounded knapsack problem (UKP) ，详见wiki。</p>
 
@@ -186,9 +186,11 @@ Author: Ray-Eldath
 <p>设m[i, w]为前 i 个item中，重量小于等于w时的最大价值，可知：</p>
 
 <ul>
-  <li>\(m[0,w]=0\)</li>
-  <li>\(m[i,w]=m[i-1,w-wi] if wi &gt; w\)</li>
-  <li>\(m[i,w]=max(m[i-1,w], [i-1,w-wi]+vi if wi \leq w) \)</li>
+  <li>
+    <script type="math/tex; mode=display">m[0,w]=0</script>
+  </li>
+  <li><script type="math/tex">m[i,w]=m[i-1,w-wi]</script> if <script type="math/tex">wi > w</script></li>
+  <li><script type="math/tex">m[i,w]=max(m[i-1,w], [i-1,w-wi]+vi)</script> if <script type="math/tex">wi \leq w</script></li>
 </ul>
 
 <p>那么，解决的办法就是计算m[n, W]。</p>

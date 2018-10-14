@@ -24,11 +24,11 @@ tags: [Algorithms]
 
 1. 使总价值v最大化
 
-maximize \\(\sum_{i=1}^{n}vixi \\)
+maximize $$\sum_{i=1}^{n}vixi $$
 
 2. 总重量小于W
 
-subject to \\(\sum_{i=1}^{n}wixi \leq W\\) and  \\(xi \in \{0,1\}\\)
+subject to $$\sum_{i=1}^{n}wixi \leq W $$ and $$xi \in {0,1}$$
 
 
 
@@ -42,9 +42,9 @@ subject to \\(\sum_{i=1}^{n}wixi \leq W\\) and  \\(xi \in \{0,1\}\\)
 
 设m[i, w]为前 i 个item中，重量小于等于w时的最大价值，可知： 
 
-* \\(m[0,w]=0\\)
-* \\(m\[i,w\]=m\[i-1,w-wi\] if wi > w\\)
-* \\(m\[i,w\]=max(m\[i-1,w\], \[i-1,w-wi\]+vi if wi \leq w) \\)
+* $$ m[0,w]=0 $$
+* $$ m[i,w]=m[i-1,w-wi] $$ if $$wi > w $$
+* $$ m[i,w]=max(m[i-1,w], [i-1,w-wi]+vi)$$ if $$wi \leq w $$
 
 那么，解决的办法就是计算m[n, W]。
 

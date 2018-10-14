@@ -5,8 +5,8 @@
     <description>1. Maybe it is not about being the best, maybe it is about finding little things that get you through the day. I guess in the end it is about surviving, anyway  you can.</description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml" />
-    <pubDate>Sun, 14 Oct 2018 10:53:51 +0800</pubDate>
-    <lastBuildDate>Sun, 14 Oct 2018 10:53:51 +0800</lastBuildDate>
+    <pubDate>Sun, 14 Oct 2018 12:00:41 +0800</pubDate>
+    <lastBuildDate>Sun, 14 Oct 2018 12:00:41 +0800</lastBuildDate>
     <generator>Jekyll v3.8.4</generator>
     
       <item>
@@ -75,9 +75,10 @@
 &lt;h1 id=&quot;2-eggs-k-floors&quot;&gt;2 Eggs, k Floors&lt;/h1&gt;
 
 &lt;blockquote&gt;
-  &lt;p&gt;A good way to start this problem is to ask “Are we able to cover all the floors with  x drops?”The crucial point here is understanding that we are not trying to find the minimum number of drops knowing the best strategy; actually, we are trying to find the best strategy supposing that the minimum number of drops is , and we have to determine if covering all the floors using at most  attempts is possible or not.
-如引述，解决这个问题的思路从最小次数变为覆盖所有楼层（k层）的最小次数。&lt;/p&gt;
+  &lt;p&gt;A good way to start this problem is to ask “Are we able to cover all the floors with  x drops?”The crucial point here is understanding that we are not trying to find the minimum number of drops knowing the best strategy; actually, we are trying to find the best strategy supposing that the minimum number of drops is , and we have to determine if covering all the floors using at most  attempts is possible or not.&lt;/p&gt;
 &lt;/blockquote&gt;
+
+&lt;p&gt;如引述，解决这个问题的思路从最小次数变为覆盖所有楼层（k层）的最小次数。&lt;/p&gt;
 
 &lt;p&gt;假设从x层开始，覆盖x次，总共可以覆盖：&lt;/p&gt;
 
@@ -290,10 +291,8 @@
         <link>http://localhost:4000/2018/10/13/Longest-increasing-subsequence.html</link>
         <guid isPermaLink="true">http://localhost:4000/2018/10/13/Longest-increasing-subsequence.html</guid>
         
-        <category>算法</category>
+        <category>Algorithms</category>
         
-        
-        <category>算法</category>
         
       </item>
     
@@ -664,10 +663,8 @@
         <link>http://localhost:4000/2018/10/13/Longest-Common-Subsequence-Problem.html</link>
         <guid isPermaLink="true">http://localhost:4000/2018/10/13/Longest-Common-Subsequence-Problem.html</guid>
         
-        <category>算法</category>
+        <category>Algorithms</category>
         
-        
-        <category>算法</category>
         
       </item>
     
@@ -694,10 +691,8 @@
         <link>http://localhost:4000/2018/10/13/Binary-Search.html</link>
         <guid isPermaLink="true">http://localhost:4000/2018/10/13/Binary-Search.html</guid>
         
-        <category>算法</category>
+        <category>Algorithms</category>
         
-        
-        <category>算法</category>
         
       </item>
     
@@ -739,13 +734,13 @@
   &lt;li&gt;使总价值v最大化&lt;/li&gt;
 &lt;/ol&gt;
 
-&lt;p&gt;maximize \(\sum_{i=1}^{n}vixi \)&lt;/p&gt;
+&lt;p&gt;maximize &lt;script type=&quot;math/tex&quot;&gt;\sum_{i=1}^{n}vixi&lt;/script&gt;&lt;/p&gt;
 
 &lt;ol&gt;
   &lt;li&gt;总重量小于W&lt;/li&gt;
 &lt;/ol&gt;
 
-&lt;p&gt;subject to \(\sum_{i=1}^{n}wixi \leq W\) and  \(xi \in {0,1}\)&lt;/p&gt;
+&lt;p&gt;subject to &lt;script type=&quot;math/tex&quot;&gt;\sum_{i=1}^{n}wixi \leq W&lt;/script&gt; and &lt;script type=&quot;math/tex&quot;&gt;xi \in {0,1}&lt;/script&gt;&lt;/p&gt;
 
 &lt;p&gt;更为复杂的有bounded knapsack problem (BKP)和unbounded knapsack problem (UKP) ，详见wiki。&lt;/p&gt;
 
@@ -756,9 +751,11 @@
 &lt;p&gt;设m[i, w]为前 i 个item中，重量小于等于w时的最大价值，可知：&lt;/p&gt;
 
 &lt;ul&gt;
-  &lt;li&gt;\(m[0,w]=0\)&lt;/li&gt;
-  &lt;li&gt;\(m[i,w]=m[i-1,w-wi] if wi &amp;gt; w\)&lt;/li&gt;
-  &lt;li&gt;\(m[i,w]=max(m[i-1,w], [i-1,w-wi]+vi if wi \leq w) \)&lt;/li&gt;
+  &lt;li&gt;
+    &lt;script type=&quot;math/tex; mode=display&quot;&gt;m[0,w]=0&lt;/script&gt;
+  &lt;/li&gt;
+  &lt;li&gt;&lt;script type=&quot;math/tex&quot;&gt;m[i,w]=m[i-1,w-wi]&lt;/script&gt; if &lt;script type=&quot;math/tex&quot;&gt;wi &gt; w&lt;/script&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;script type=&quot;math/tex&quot;&gt;m[i,w]=max(m[i-1,w], [i-1,w-wi]+vi)&lt;/script&gt; if &lt;script type=&quot;math/tex&quot;&gt;wi \leq w&lt;/script&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;p&gt;那么，解决的办法就是计算m[n, W]。&lt;/p&gt;
@@ -886,10 +883,8 @@
         <link>http://localhost:4000/2018/10/13/0-1-Knapsack-problem.html</link>
         <guid isPermaLink="true">http://localhost:4000/2018/10/13/0-1-Knapsack-problem.html</guid>
         
-        <category>算法</category>
+        <category>Algorithms</category>
         
-        
-        <category>算法</category>
         
       </item>
     

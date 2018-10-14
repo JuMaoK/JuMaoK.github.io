@@ -30,7 +30,8 @@ tags: [Algorithms]
 # 2 Eggs, k Floors
 
 > A good way to start this problem is to ask "Are we able to cover all the floors with  x drops?"The crucial point here is understanding that we are not trying to find the minimum number of drops knowing the best strategy; actually, we are trying to find the best strategy supposing that the minimum number of drops is , and we have to determine if covering all the floors using at most  attempts is possible or not.
-> 如引述，解决这个问题的思路从最小次数变为覆盖所有楼层（k层）的最小次数。
+
+如引述，解决这个问题的思路从最小次数变为覆盖所有楼层（k层）的最小次数。
 
 假设从x层开始，覆盖x次，总共可以覆盖：
 
