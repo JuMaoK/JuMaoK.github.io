@@ -1,0 +1,33 @@
+[
+  
+    {
+      "title"    : "Egg Dropping problem",
+      "tags"     : "Algorithms",
+      "url"      : "/2018/10/13/egg-dropping.html"
+    } ,
+  
+    {
+      "title"    : "Longest increasing subsequence",
+      "tags"     : "算法",
+      "url"      : "/2018/10/13/Longest-increasing-subsequence.html"
+    } ,
+  
+    {
+      "title"    : "Longest common subsequence problem",
+      "tags"     : "算法",
+      "url"      : "/2018/10/13/Longest-Common-Subsequence-Problem.html"
+    } ,
+  
+    {
+      "title"    : "Binary Search",
+      "tags"     : "算法",
+      "url"      : "/2018/10/13/Binary-Search.html"
+    } ,
+  
+    {
+      "title"    : "0/1 Knapsack problem",
+      "tags"     : "算法",
+      "url"      : "/2018/10/13/0-1-Knapsack-problem.html"
+    } 
+  
+]

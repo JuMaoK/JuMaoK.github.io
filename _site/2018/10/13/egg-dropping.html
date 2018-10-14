@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Egg Dropping problem - Chase</title>
+    <meta name="author"  content="Chase">
+    <meta name="description" content="Egg Dropping problem">
+    <meta name="keywords"  content="Algorithms">
+    <!-- Open Graph -->
+    <meta property="og:title" content="Egg Dropping problem - Chase">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="http://localhost:4000/2018/10/13/egg-dropping.html">
+    <meta property="og:description" content="1. Maybe it is not about being the best, maybe it is about finding little things that get you through the day. I guess in the end it is about surviving, anyway  you can.">
+    <meta property="og:site_name" content="Chase">
+    <link rel="stylesheet" href="//cdn.staticfile.org/normalize/6.0.0/normalize.min.css">
+    <link rel="stylesheet" href="//at.alicdn.com/t/font_roc50gemkxpw4s4i.css">
+    <link rel="stylesheet" href="/assets/css/github-markdown.css">
+    <link rel="stylesheet" href="/assets/css/prism.css">
+    <link rel="stylesheet" href="/assets/css/share.min.css">
+    <link rel="stylesheet" href="/assets/css/app.min.css">
+    <link rel="stylesheet" href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+	
+	<!--
+Author: Ray-Eldath
+refer to:
+ - http://docs.mathjax.org/en/latest/options/index.html
+-->
+
+	<script type="text/javascript" async src="https://cdn.bootcss.com/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+	
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+		jax: ["input/TeX", "output/HTML-CSS"],
+		tex2jax: {
+			inlineMath: [ ["$", "$"] ],
+			displayMath: [ ["$$", "$$"] ],
+			skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+		},
+		"HTML-CSS": { preferredFont: "TeX", availableFonts: ["STIX","TeX"] }
+      });
+    </script>
+
+	
+    <!--
+Author: Ray-Eldath
+-->
+<style>
+    .markdown-body .anchor{
+        float: left;
+        margin-top: -8px;
+        margin-left: -20px;
+        padding-right: 4px;
+        line-height: 1;
+        opacity: 0;
+    }
+    
+    .markdown-body .anchor .anchor-icon{
+        font-size: 15px
+    }
+</style>
+<script>
+    $(document).ready(function() {
+        let nodes = document.querySelector(".markdown-body").querySelectorAll("h1,h2,h3")
+        for(let node of nodes) {
+            var anchor = document.createElement("a")
+            var anchorIcon = document.createElement("i")
+            anchorIcon.setAttribute("class", "fa fa-anchor fa-lg anchor-icon")
+            anchorIcon.setAttribute("aria-hidden", true)
+            anchor.setAttribute("class", "anchor")
+            anchor.setAttribute("href", "#" + node.getAttribute("id"))
+            
+            anchor.onmouseover = function() {
+                this.style.opacity = "0.4"
+            }
+            
+            anchor.onmouseout = function() {
+                this.style.opacity = "0"
+            }
+            
+            anchor.appendChild(anchorIcon)
+            node.appendChild(anchor)
+        }
+    })
+</script>
+</head>
+
+
+<body>
+  <!--[if lt IE 10]>
+<div class="alert-danger" role="alert">你的浏览器实在太太太旧了，放学别走，升级完浏览器再说！<a target="_blank" class="alert-link" href="http://browsehappy.com">立即升级</a></div>
+<![endif]-->
+  <input id="nm-switch" type="hidden" value="true"> <header class="g-header">
+    <div class="g-logo">
+      <a href="/"></a>
+    </div>
+    <i id="menu-toggle" class="iconfont icon-menu"></i>
+    <nav class="g-nav">
+        <ul>
+            
+            <li><a href="/">home</a></li>
+            
+            <li><a href="/tags.html">tags</a></li>
+            
+        </ul>
+    </nav>
+</header>
+
+
+  <header
+    class="g-banner post-header post-pattern-seaOfClouds bgcolor-default post-no-cover"
+    data-theme="default"
+  >
+    <div class="post-wrapper">
+      <div class="post-tags">
+        
+          
+            <a href="http://localhost:4000/tags#Algorithms" class="post-tag">Algorithms</a>
+          
+        
+      </div>
+      <h1>Egg Dropping problem</h1>
+      <div class="post-meta">
+        <span class="post-meta-item"><i class="iconfont icon-author"></i>Chase</span>
+        <time class="post-meta-item" datetime="18-10-13"><i class="iconfont icon-date"></i>13 Oct 2018</time>
+      </div>
+    </div>
+    
+  </header>
+
+  <div class="post-content visible">
+    
+
+    <article class="markdown-body">
+      <ul class="toc" id="markdown-toc">
+  <li><a href="#reference" id="markdown-toc-reference">reference</a></li>
+  <li><a href="#2-eggs-100-floors" id="markdown-toc-2-eggs-100-floors">2 Eggs, 100 Floors</a></li>
+  <li><a href="#2-eggs-k-floors" id="markdown-toc-2-eggs-k-floors">2 Eggs, k Floors</a></li>
+  <li><a href="#n-eggs-k-floors" id="markdown-toc-n-eggs-k-floors">N Eggs, k Floors</a>    <ul>
+      <li><a href="#思路" id="markdown-toc-思路">思路</a></li>
+      <li><a href="#代码有bug" id="markdown-toc-代码有bug">代码(有bug)</a></li>
+    </ul>
+  </li>
+</ul>
+<hr />
+
+<h3 id="reference">reference</h3>
+<blockquote>
+  <p><a href="https://brilliant.org/wiki/egg-dropping/#see-also">Egg Dropping</a></p>
+</blockquote>
+
+<h1 id="2-eggs-100-floors">2 Eggs, 100 Floors</h1>
+<p>二分法在这里不可行。</p>
+
+<p>最优是从14层开始丢。</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>1st egg</th>
+      <th>if the first egg breaks –&gt; 2nd egg</th>
+      <th>drops</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>14</td>
+      <td>1-2-3-4-5-6-7-8-9-10-11-12-13</td>
+      <td>1+13=14</td>
+    </tr>
+    <tr>
+      <td>27</td>
+      <td>15-16-17-18-19-20-21-22-23-24-25-26</td>
+      <td>2+12=14</td>
+    </tr>
+    <tr>
+      <td>…</td>
+      <td> </td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>95</td>
+      <td>91-92-93-94</td>
+      <td>10+4=14</td>
+    </tr>
+    <tr>
+      <td>99</td>
+      <td>100</td>
+      <td>11+1=12</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>这种办法，大部分情况都只需最多14次就能找到n。</p>
+
+<h1 id="2-eggs-k-floors">2 Eggs, k Floors</h1>
+
+<blockquote>
+  <p>A good way to start this problem is to ask “Are we able to cover all the floors with  x drops?”The crucial point here is understanding that we are not trying to find the minimum number of drops knowing the best strategy; actually, we are trying to find the best strategy supposing that the minimum number of drops is , and we have to determine if covering all the floors using at most  attempts is possible or not.
+如引述，解决这个问题的思路从最小次数变为覆盖所有楼层（k层）的最小次数。</p>
+</blockquote>
+
+<p>假设从x层开始，覆盖x次，总共可以覆盖：</p>
+
+<script type="math/tex; mode=display">x + (x-1)  + (x-2) + (x-3) + ... + 2 + 1 (+ 0) = \frac {x(x+1)} {2}</script>
+
+<p>层楼。</p>
+
+<p>为使覆盖楼层大于等于k层，即：</p>
+
+<script type="math/tex; mode=display">\frac {x(x+1)} {2} \geq k</script>
+
+<p>解方程，得：</p>
+
+<script type="math/tex; mode=display">x = \frac {-1 + \sqrt{1+8k}} {2}</script>
+
+<p>注意：x必须为整数</p>
+
+<p>如2蛋100层的情况，x = 13.65 = 14</p>
+
+<h1 id="n-eggs-k-floors">N Eggs, k Floors</h1>
+
+<p>问题要求我们用最少的鸡蛋，覆盖所有k楼层（在最坏的情况下）。</p>
+
+<p>要比较有效率地解决这个问题，需要先知道以下的数学例子：</p>
+
+<p><strong>组合 (Combinations)</strong></p>
+
+<script type="math/tex; mode=display">C\binom{n}{k} = C(n, k) = \binom{n}{k} = \frac{n!}{k!(n-k)!}</script>
+
+<p><strong>杨辉三角 (Pascal triangle)</strong></p>
+
+<p><img src="https://ds055uzetaobb.cloudfront.net/image_optimizer/78406ed1c4b37b62d760853d723b91a300f2ce62.png" alt="" /></p>
+
+<p><strong>并且</strong></p>
+
+<p><img src="https://ds055uzetaobb.cloudfront.net/image_optimizer/a837ebdd3d308279fbe02ff8b99355b7692a387e.png" alt="" /></p>
+
+<p>可找到规律：</p>
+
+<script type="math/tex; mode=display">C(n, k) = C(n-1, k) + C(n-1, k-1)</script>
+
+<script type="math/tex; mode=display"> C(n, 0) = \frac{n!}{0!(n-0)!} = 1$  and  $C(n, n) = \frac{n!}{n!(n-n)!} = 1</script>
+
+<h2 id="思路">思路</h2>
+
+<p>设方程$f(d, n)$，代表用被覆盖的楼层数。</p>
+
+<p>其中，n代表剩余的鸡蛋，d代表在最坏情况下，剩下所需投下的次数。</p>
+
+<p><em>（可以用2蛋100层的例子简化思路来理解）</em></p>
+
+<ol>
+  <li>蛋碎了：剩下$f(d-1, n-1)$层楼需要被覆盖；</li>
+  <li>蛋不碎：剩下$f(d-1, n)$层楼需要被覆盖</li>
+</ol>
+
+<p>所以：</p>
+
+<script type="math/tex; mode=display">f(d, n) = 1 + f(d-1, n-1) + f(d-1, n)</script>
+
+<p>为找到这个方程，我们首先引入一个辅助方程<script type="math/tex">g(d, n)</script>:</p>
+
+<script type="math/tex; mode=display">g(d, n) = f(d, n+1) - f(d, n)</script>
+
+<p>变形可得：</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{align}g(d, n) & = f(d, n+1)-f(d,n)\\&= f(d-1,n+1)+f(d-1,n)+1-f(d-1,n)-f(d-1,n-1)-1\\&=[f(d-1, n+1)-f(d-1,n)] + [f(d-1,n)-f(d-1,n-1)]\\&=g(d-1,n) + g(d-1,n-1)\end{align} %]]></script>
+
+<p>可发现这个公式与上面combinas的公式一模一样，不妨把它写作</p>
+
+<script type="math/tex; mode=display">g(d,n)=\binom{d}{n}</script>
+
+<p>但还有个问题，就是$f(0,n)$与$g(0,n)$都等于0，所以需要重设公式：</p>
+
+<script type="math/tex; mode=display">g(d,n)=\binom{d}{n+1}</script>
+
+<p>具体验证就不做了。。。</p>
+
+<p>回到$f(d,n)$，求和：</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{align}f(d,n)&=[f(d,n)-f(d,n-1)]\\&+[f(d,n-1)-f(d,n-2)]\\&+\cdots\\&+[f(d,1)-f(d,0)]\\&+f(d,0)\end{align} %]]></script>
+
+<p>因为<script type="math/tex">f(d,0)=0</script></p>
+
+<script type="math/tex; mode=display">f(d,n) =g(d,n-1)+g(d,n-2) + \cdots + g(d,0)</script>
+
+<p>并且</p>
+
+<script type="math/tex; mode=display">g(d,n)=\binom{d}{n+1}</script>
+
+<p>所以：</p>
+
+<script type="math/tex; mode=display">g(d,n-1)+g(d,n-2) + \cdots + g(d,0) = \binom{d}{n}+\binom{d}{n-1}+\cdots+\binom{d}{1}</script>
+
+<p>最后：</p>
+
+<script type="math/tex; mode=display">f(d,n) = \sum_{i=0}^{N}{\binom{d}{i}}</script>
+
+<p><strong>求解</strong></p>
+
+<p>我们现已至$f(d,n)$的公式，接下来要用它找到最小的扔下次数d。</p>
+
+<p>因为$f(d,n)$代表在最坏情况下，用n只蛋在不超过d次内可以覆盖的楼层数。</p>
+
+<p>对于k层楼而言，只需要：</p>
+
+<p><script type="math/tex">f(d,n)\geq k</script>，即</p>
+
+<script type="math/tex; mode=display">\sum_{i=0}^{N}{\binom{d}{i}} \geq k</script>
+
+<p>即告完成！</p>
+
+<h2 id="代码有bug">代码(有bug)</h2>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">factorial</span>
+
+
+<span class="k">def</span> <span class="nf">comb</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">factorial</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">factorial</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="o">*</span> <span class="n">factorial</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="n">k</span><span class="p">))</span>
+
+
+<span class="k">def</span> <span class="nf">cover_floor</span><span class="p">(</span><span class="n">drops</span><span class="p">,</span> <span class="n">n_eggs</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">sum</span><span class="p">([</span><span class="n">comb</span><span class="p">(</span><span class="n">drops</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span> <span class="k">for</span> <span class="n">N</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_eggs</span><span class="o">+</span><span class="mi">1</span><span class="p">)])</span>
+
+
+<span class="k">def</span> <span class="nf">answer</span><span class="p">(</span><span class="n">n_eggs</span><span class="p">,</span> <span class="n">k_floors</span><span class="p">):</span>
+    <span class="n">hi</span> <span class="o">=</span> <span class="n">k_floors</span>
+    <span class="n">lo</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">while</span> <span class="n">lo</span> <span class="o">&lt;=</span> <span class="n">hi</span><span class="p">:</span>
+        <span class="n">mid</span> <span class="o">=</span> <span class="p">(</span><span class="n">lo</span> <span class="o">+</span> <span class="n">hi</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span>
+        <span class="k">if</span> <span class="n">cover_floor</span><span class="p">(</span><span class="n">mid</span><span class="p">,</span> <span class="n">n_eggs</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">k_floors</span><span class="p">:</span>
+            <span class="n">hi</span> <span class="o">=</span> <span class="n">mid</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="k">elif</span> <span class="n">cover_floor</span><span class="p">(</span><span class="n">mid</span><span class="p">,</span> <span class="n">n_eggs</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">k_floors</span><span class="p">:</span>
+            <span class="n">lo</span> <span class="o">=</span> <span class="n">mid</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">lo</span>
+</code></pre></div></div>
+
+
+    </article>
+
+    
+    <div class="social-share-wrapper">
+      <div class="social-share"></div>
+    </div>
+    
+  </div>
+
+  <section class="author-detail">
+    <section class="post-footer-item author-card">
+      <div class="avatar">
+        <img src="http://localhost:4000/assets/img/IMG_1744.JPG" alt="">
+      </div>
+      <div class="author-name" rel="author">Chase</div>
+      <div class="bio">
+        <p></p>
+      </div>
+      
+      <ul class="sns-links">
+        
+        <li>
+          <a href="//github.com/jumaok" target="_blank">
+                    <i class="iconfont icon-github"></i>
+                </a>
+        </li>
+        
+      </ul>
+      
+    </section>
+    <section class="post-footer-item read-next">
+      
+
+      
+      <div class="read-next-item">
+        <a href="/2018/10/13/Longest-increasing-subsequence.html" class="read-next-link"></a>
+          <section>
+            <span>Longest increasing subsequence</span>
+            <p>  ReferenceReference</p>
+          </section>
+          
+      </div>
+      
+    </section>
+    
+  </section>
+
+  <footer class="g-footer">
+  <section>Chase ©
+  
+  
+  2018
+  </section>
+  <section>Powered by <a href="//jekyllrb.com">Jekyll</a> | <a href="https://github.com/kaeyleo/jekyll-theme-H2O">Theme H2O</a></section>
+</footer>
+
+
+  <script src="/assets/js/social-share.min.js"></script>
+  <script>
+    socialShare('.social-share', {
+      sites: [
+        
+          'wechat'
+          ,
+          
+        
+          'weibo'
+          ,
+          
+        
+          'douban'
+          ,
+          
+        
+          'twitter'
+          
+        
+      ],
+      wechatQrcodeTitle: "分享到微信朋友圈",
+      wechatQrcodeHelper: '<p>扫码后点击右上角</p><p>将本文分享至朋友圈</p>'
+    });
+  </script>
+
+  
+
+  <script src="/assets/js/prism.js"></script>
+  <script src="/assets/js/index.min.js"></script>
+</body>
+
+</html>
