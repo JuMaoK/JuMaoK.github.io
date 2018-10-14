@@ -2,8 +2,7 @@
 layout: post
 title: "0/1 Knapsack problem"
 description: "0/1 Knapsack problem"
-categories: [算法]
-tags: [算法]
+tags: [Algorithms]
 ---
 
 * 目录

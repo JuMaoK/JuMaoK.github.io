@@ -2,8 +2,7 @@
 layout: post
 title: "Longest common subsequence problem"
 description: "最长共有子序列"
-categories: [算法]
-tags: [算法]
+tags: [Algorithms]
 ---
 
 * 目录

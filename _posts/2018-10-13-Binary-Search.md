@@ -2,8 +2,7 @@
 layout: post
 title: "Binary Search"
 description: "Binary Search using bisect modual"
-categories: [算法]
-tags: [算法]
+tags: [Algorithms]
 ---
 
 > A binary search divides a range of values into halves, and continues to narrow down the field of search until the unknown value is found. It is the classic example of a "divide and conquer" algorithm.

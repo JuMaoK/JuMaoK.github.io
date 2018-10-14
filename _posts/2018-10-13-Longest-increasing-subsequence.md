@@ -2,8 +2,7 @@
 layout: post
 title: "Longest increasing subsequence"
 description: "最长上升/下降子序列"
-categories: [算法]
-tags: [算法]
+tags: [Algorithms]
 ---
 
 
