@@ -1,9 +1,10 @@
 ---
 layout: post
 title: "Egg Dropping problem"
-description: "假设n个理想的蛋，在一座塔的第k层扔下去会碎掉，n层以下怎么扔都能保持完好状态。怎样用有限的蛋，尽可能快地找出楼层k."
 tags: [Algorithms]
 ---
+
+假设n个理想的蛋，在一座塔的第k层扔下去会碎掉，n层以下怎么扔都能保持完好状态。怎样用有限的蛋，尽可能快地找出楼层k.
 
 * 目录
 {:toc .toc}

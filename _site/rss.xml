@@ -5,13 +5,104 @@
     <description>1. Maybe it is not about being the best, maybe it is about finding little things that get you through the day. I guess in the end it is about surviving, anyway  you can.</description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml" />
-    <pubDate>Sun, 14 Oct 2018 12:00:41 +0800</pubDate>
-    <lastBuildDate>Sun, 14 Oct 2018 12:00:41 +0800</lastBuildDate>
+    <pubDate>Sun, 14 Oct 2018 15:51:32 +0800</pubDate>
+    <lastBuildDate>Sun, 14 Oct 2018 15:51:32 +0800</lastBuildDate>
     <generator>Jekyll v3.8.4</generator>
     
       <item>
+        <title>Python的垃圾回收机制</title>
+        <description>&lt;p&gt;Python的垃圾回收机制&lt;/p&gt;
+
+&lt;ul class=&quot;toc&quot; id=&quot;markdown-toc&quot;&gt;
+  &lt;li&gt;&lt;a href=&quot;#reference&quot; id=&quot;markdown-toc-reference&quot;&gt;Reference&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#garbage-collector的作用&quot; id=&quot;markdown-toc-garbage-collector的作用&quot;&gt;Garbage Collector的作用&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#reference-counting&quot; id=&quot;markdown-toc-reference-counting&quot;&gt;Reference Counting&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#generational-garbage-collection&quot; id=&quot;markdown-toc-generational-garbage-collection&quot;&gt;generational garbage collection&lt;/a&gt;    &lt;ul&gt;
+      &lt;li&gt;&lt;a href=&quot;#generation-zeroonetwo&quot; id=&quot;markdown-toc-generation-zeroonetwo&quot;&gt;Generation Zero，One，Two&lt;/a&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr /&gt;
+&lt;h3 id=&quot;reference&quot;&gt;Reference&lt;/h3&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;a href=&quot;http://patshaughnessy.net/2013/10/24/visualizing-garbage-collection-in-ruby-and-python&quot;&gt;Visualizing Garbage Collection by Pat Shuaghnessy&lt;/a&gt;&lt;/p&gt;
+
+  &lt;p&gt;&lt;a href=&quot;http://patshaughnessy.net/2013/10/30/generational-gc-in-python-and-ruby&quot;&gt;Generational GC in Python and Ruby by Pat Shuaghnessy&lt;/a&gt;&lt;/p&gt;
+
+  &lt;p&gt;&lt;a href=&quot;https://www.quora.com/How-does-garbage-collection-in-Python-work-What-are-the-pros-and-cons&quot;&gt;quora&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h1 id=&quot;garbage-collector的作用&quot;&gt;Garbage Collector的作用&lt;/h1&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;为新对象分配内存（allocate memory for new objects）&lt;/li&gt;
+  &lt;li&gt;辨别垃圾对象（identify garbage objects, and）&lt;/li&gt;
+  &lt;li&gt;回收内存（reclaim memory from garbage objects.）&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h1 id=&quot;reference-counting&quot;&gt;Reference Counting&lt;/h1&gt;
+
+&lt;p&gt;Python会在创建新对象时实时向系统申请内存。&lt;/p&gt;
+
+&lt;p&gt;新的对象创建后，对象内部用&lt;em&gt;reference count&lt;/em&gt;记录被引用数，每新增一个引用reference count增加1，反之减少1。当减少到0时，内存被回收。&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;Just as before, Python sets the reference count in JKL to be 1. However, also notice since we changed n1 to point to JKL, it no longer references ABC, and that Python decremented its reference count down to 0.&lt;/p&gt;
+
+  &lt;p&gt;At this point, the Python garbage collector immediately jumps into action! Whenever an object’s reference count reaches zero, Python immediately frees it, returning it’s memory to the operating system:&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://patshaughnessy.net/assets/2013/10/24/python6.png&quot; alt=&quot;img&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;reference counting的缺点&lt;/strong&gt;&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;需要为每个对象额外增加空间以支持reference count（minor space penalty）。&lt;/li&gt;
+  &lt;li&gt;速度更慢。&lt;/li&gt;
+  &lt;li&gt;有时候会失效：含有循环结构的数据结构（cyclic data structure）的被引用数永不为0，如下代码所示&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;Node&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;__init__&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;val&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+        &lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;val&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;n1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Node&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'ABC'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;  &lt;span class=&quot;c1&quot;&gt;# refcnt = 1
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Node&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'DEF'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;  &lt;span class=&quot;c1&quot;&gt;# refcnt = 1
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;next&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;n2&lt;/span&gt;      &lt;span class=&quot;c1&quot;&gt;# refcnt = 2
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n2&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;prev&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;n1&lt;/span&gt;      &lt;span class=&quot;c1&quot;&gt;# refcnt = 2
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;bp&quot;&gt;None&lt;/span&gt;         &lt;span class=&quot;c1&quot;&gt;# refcnt = 1
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;bp&quot;&gt;None&lt;/span&gt;         &lt;span class=&quot;c1&quot;&gt;# refcnt = 1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h1 id=&quot;generational-garbage-collection&quot;&gt;generational garbage collection&lt;/h1&gt;
+
+&lt;p&gt;由于Reference counting无法解决循环引用的问题，Python引入了第二个算法：&lt;em&gt;generational garbage collection&lt;/em&gt;（约在2.1版本里开始引入）。&lt;/p&gt;
+
+&lt;p&gt;Python用一个linked list来追踪被激活的对象，称为&lt;em&gt;Generation Zero&lt;/em&gt;。python会逐个对对象检测是否含有相互引用并降低其refcnt。&lt;/p&gt;
+
+&lt;h3 id=&quot;generation-zeroonetwo&quot;&gt;Generation Zero，One，Two&lt;/h3&gt;
+
+&lt;p&gt;随程序运行，被占用的资源达到某个阀值时，python的collector被激活，对Generation Zero进行清洗。但并不是全部清除，那些将会被继续使用的对象会被迁移到Generation One。当被占用资源继续上升，到达某个阀值时，类似的过程会发生在Generation One上，“幸存”的对象继续被迁移到Generation Two。&lt;/p&gt;
+
+&lt;p&gt;因此，0代的对象会被更频繁地进行清理，2代频率最低。这意味着，约“老”的对象倾向于存活的更久。这种处理办法的根据是Weak Generational Hypothesis。&lt;/p&gt;
+
+</description>
+        <pubDate>Sun, 14 Oct 2018 00:00:00 +0800</pubDate>
+        <link>http://localhost:4000/2018/10/14/garbage-collector.html</link>
+        <guid isPermaLink="true">http://localhost:4000/2018/10/14/garbage-collector.html</guid>
+        
+        <category>Python</category>
+        
+        <category>Concept</category>
+        
+        
+      </item>
+    
+      <item>
         <title>Egg Dropping problem</title>
-        <description>&lt;ul class=&quot;toc&quot; id=&quot;markdown-toc&quot;&gt;
+        <description>&lt;p&gt;假设n个理想的蛋，在一座塔的第k层扔下去会碎掉，n层以下怎么扔都能保持完好状态。怎样用有限的蛋，尽可能快地找出楼层k.&lt;/p&gt;
+
+&lt;ul class=&quot;toc&quot; id=&quot;markdown-toc&quot;&gt;
   &lt;li&gt;&lt;a href=&quot;#reference&quot; id=&quot;markdown-toc-reference&quot;&gt;reference&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;#2-eggs-100-floors&quot; id=&quot;markdown-toc-2-eggs-100-floors&quot;&gt;2 Eggs, 100 Floors&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;#2-eggs-k-floors&quot; id=&quot;markdown-toc-2-eggs-k-floors&quot;&gt;2 Eggs, k Floors&lt;/a&gt;&lt;/li&gt;
@@ -230,7 +321,9 @@
     
       <item>
         <title>Longest increasing subsequence</title>
-        <description>&lt;ul class=&quot;toc&quot; id=&quot;markdown-toc&quot;&gt;
+        <description>&lt;p&gt;最长上升/下降子序列&lt;/p&gt;
+
+&lt;ul class=&quot;toc&quot; id=&quot;markdown-toc&quot;&gt;
   &lt;li&gt;&lt;a href=&quot;#reference&quot; id=&quot;markdown-toc-reference&quot;&gt;Reference&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;#应用场景&quot; id=&quot;markdown-toc-应用场景&quot;&gt;应用场景&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;#原理&quot; id=&quot;markdown-toc-原理&quot;&gt;原理&lt;/a&gt;&lt;/li&gt;
@@ -298,7 +391,9 @@
     
       <item>
         <title>Longest common subsequence problem</title>
-        <description>&lt;ul class=&quot;toc&quot; id=&quot;markdown-toc&quot;&gt;
+        <description>&lt;p&gt;最长共有子序列&lt;/p&gt;
+
+&lt;ul class=&quot;toc&quot; id=&quot;markdown-toc&quot;&gt;
   &lt;li&gt;&lt;a href=&quot;#references&quot; id=&quot;markdown-toc-references&quot;&gt;References&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;#python代码&quot; id=&quot;markdown-toc-python代码&quot;&gt;Python代码&lt;/a&gt;    &lt;ul&gt;
       &lt;li&gt;&lt;a href=&quot;#recursion&quot; id=&quot;markdown-toc-recursion&quot;&gt;Recursion&lt;/a&gt;&lt;/li&gt;
@@ -670,7 +765,9 @@
     
       <item>
         <title>Binary Search</title>
-        <description>&lt;blockquote&gt;
+        <description>&lt;p&gt;二分查找 by using bisect modual&lt;/p&gt;
+
+&lt;blockquote&gt;
   &lt;p&gt;A binary search divides a range of values into halves, and continues to narrow down the field of search until the unknown value is found. It is the classic example of a “divide and conquer” algorithm.&lt;/p&gt;
 
   &lt;p&gt;As an analogy, consider the children’s game “&lt;a href=&quot;https://rosettacode.org/wiki/Guess_the_number/With_feedback&quot;&gt;guess a number&lt;/a&gt;.” The scorer has a secret number, and will only tell the player if their guessed number is higher than, lower than, or equal to the secret number. The player then uses this information to guess a new number.&lt;/p&gt;
@@ -698,7 +795,9 @@
     
       <item>
         <title>0/1 Knapsack problem</title>
-        <description>&lt;ul class=&quot;toc&quot; id=&quot;markdown-toc&quot;&gt;
+        <description>&lt;p&gt;0/1 Knapsack problem&lt;/p&gt;
+
+&lt;ul class=&quot;toc&quot; id=&quot;markdown-toc&quot;&gt;
   &lt;li&gt;&lt;a href=&quot;#references&quot; id=&quot;markdown-toc-references&quot;&gt;References&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;#原理&quot; id=&quot;markdown-toc-原理&quot;&gt;原理&lt;/a&gt;    &lt;ul&gt;
       &lt;li&gt;&lt;a href=&quot;#dynamic-programming&quot; id=&quot;markdown-toc-dynamic-programming&quot;&gt;Dynamic programming&lt;/a&gt;        &lt;ul&gt;

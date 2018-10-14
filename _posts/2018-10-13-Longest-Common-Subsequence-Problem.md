@@ -1,9 +1,9 @@
 ---
 layout: post
 title: "Longest common subsequence problem"
-description: "最长共有子序列"
 tags: [Algorithms]
 ---
+最长共有子序列
 
 * 目录
 {:toc .toc}

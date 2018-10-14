@@ -1,6 +1,12 @@
 [
   
     {
+      "title"    : "Python的垃圾回收机制",
+      "tags"     : "Python Concept",
+      "url"      : "/2018/10/14/garbage-collector.html"
+    } ,
+  
+    {
       "title"    : "Egg Dropping problem",
       "tags"     : "Algorithms",
       "url"      : "/2018/10/13/egg-dropping.html"

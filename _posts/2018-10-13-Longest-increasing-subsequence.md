@@ -1,10 +1,9 @@
 ---
 layout: post
 title: "Longest increasing subsequence"
-description: "最长上升/下降子序列"
 tags: [Algorithms]
 ---
-
+最长上升/下降子序列
 
 * 目录
 {:toc .toc}

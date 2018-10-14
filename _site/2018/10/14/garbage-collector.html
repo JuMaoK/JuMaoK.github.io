@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python的垃圾回收机制 - Chase</title>
+    <meta name="author"  content="Chase">
+    <meta name="description" content="Python的垃圾回收机制">
+    <meta name="keywords"  content="Python, Concept">
+    <!-- Open Graph -->
+    <meta property="og:title" content="Python的垃圾回收机制 - Chase">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="http://localhost:4000/2018/10/14/garbage-collector.html">
+    <meta property="og:description" content="1. Maybe it is not about being the best, maybe it is about finding little things that get you through the day. I guess in the end it is about surviving, anyway  you can.">
+    <meta property="og:site_name" content="Chase">
+    <link rel="stylesheet" href="//cdn.staticfile.org/normalize/6.0.0/normalize.min.css">
+    <link rel="stylesheet" href="//at.alicdn.com/t/font_roc50gemkxpw4s4i.css">
+    <link rel="stylesheet" href="/assets/css/github-markdown.css">
+    <link rel="stylesheet" href="/assets/css/prism.css">
+    <link rel="stylesheet" href="/assets/css/share.min.css">
+    <link rel="stylesheet" href="/assets/css/app.min.css">
+    <link rel="stylesheet" href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+	
+	<!--
+Author: Ray-Eldath
+refer to:
+ - http://docs.mathjax.org/en/latest/options/index.html
+-->
+
+	<script type="text/javascript" async src="https://cdn.bootcss.com/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+	
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+		jax: ["input/TeX", "output/HTML-CSS"],
+		tex2jax: {
+			inlineMath: [ ["$", "$"] ],
+			displayMath: [ ["$$", "$$"] ],
+			skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+		},
+		"HTML-CSS": { preferredFont: "TeX", availableFonts: ["STIX","TeX"] }
+      });
+    </script>
+
+	
+    <!--
+Author: Ray-Eldath
+-->
+<style>
+    .markdown-body .anchor{
+        float: left;
+        margin-top: -8px;
+        margin-left: -20px;
+        padding-right: 4px;
+        line-height: 1;
+        opacity: 0;
+    }
+    
+    .markdown-body .anchor .anchor-icon{
+        font-size: 15px
+    }
+</style>
+<script>
+    $(document).ready(function() {
+        let nodes = document.querySelector(".markdown-body").querySelectorAll("h1,h2,h3")
+        for(let node of nodes) {
+            var anchor = document.createElement("a")
+            var anchorIcon = document.createElement("i")
+            anchorIcon.setAttribute("class", "fa fa-anchor fa-lg anchor-icon")
+            anchorIcon.setAttribute("aria-hidden", true)
+            anchor.setAttribute("class", "anchor")
+            anchor.setAttribute("href", "#" + node.getAttribute("id"))
+            
+            anchor.onmouseover = function() {
+                this.style.opacity = "0.4"
+            }
+            
+            anchor.onmouseout = function() {
+                this.style.opacity = "0"
+            }
+            
+            anchor.appendChild(anchorIcon)
+            node.appendChild(anchor)
+        }
+    })
+</script>
+</head>
+
+
+<body>
+  <!--[if lt IE 10]>
+<div class="alert-danger" role="alert">你的浏览器实在太太太旧了，放学别走，升级完浏览器再说！<a target="_blank" class="alert-link" href="http://browsehappy.com">立即升级</a></div>
+<![endif]-->
+  <input id="nm-switch" type="hidden" value="true"> <header class="g-header">
+    <div class="g-logo">
+      <a href="/"></a>
+    </div>
+    <i id="menu-toggle" class="iconfont icon-menu"></i>
+    <nav class="g-nav">
+        <ul>
+            
+            <li><a href="/">home</a></li>
+            
+            <li><a href="/tags.html">tags</a></li>
+            
+        </ul>
+    </nav>
+</header>
+
+
+  <header
+    class="g-banner post-header post-pattern-seaOfClouds bgcolor-default post-no-cover"
+    data-theme="default"
+  >
+    <div class="post-wrapper">
+      <div class="post-tags">
+        
+          
+            <a href="http://localhost:4000/tags#Python" class="post-tag">Python</a>
+          
+            <a href="http://localhost:4000/tags#Concept" class="post-tag">Concept</a>
+          
+        
+      </div>
+      <h1>Python的垃圾回收机制</h1>
+      <div class="post-meta">
+        <span class="post-meta-item"><i class="iconfont icon-author"></i>Chase</span>
+        <time class="post-meta-item" datetime="18-10-14"><i class="iconfont icon-date"></i>14 Oct 2018</time>
+      </div>
+    </div>
+    
+  </header>
+
+  <div class="post-content visible">
+    
+
+    <article class="markdown-body">
+      <p>Python的垃圾回收机制</p>
+
+<ul class="toc" id="markdown-toc">
+  <li><a href="#reference" id="markdown-toc-reference">Reference</a></li>
+  <li><a href="#garbage-collector的作用" id="markdown-toc-garbage-collector的作用">Garbage Collector的作用</a></li>
+  <li><a href="#reference-counting" id="markdown-toc-reference-counting">Reference Counting</a></li>
+  <li><a href="#generational-garbage-collection" id="markdown-toc-generational-garbage-collection">generational garbage collection</a>    <ul>
+      <li><a href="#generation-zeroonetwo" id="markdown-toc-generation-zeroonetwo">Generation Zero，One，Two</a></li>
+    </ul>
+  </li>
+</ul>
+<hr />
+<h3 id="reference">Reference</h3>
+<blockquote>
+  <p><a href="http://patshaughnessy.net/2013/10/24/visualizing-garbage-collection-in-ruby-and-python">Visualizing Garbage Collection by Pat Shuaghnessy</a></p>
+
+  <p><a href="http://patshaughnessy.net/2013/10/30/generational-gc-in-python-and-ruby">Generational GC in Python and Ruby by Pat Shuaghnessy</a></p>
+
+  <p><a href="https://www.quora.com/How-does-garbage-collection-in-Python-work-What-are-the-pros-and-cons">quora</a></p>
+</blockquote>
+
+<h1 id="garbage-collector的作用">Garbage Collector的作用</h1>
+
+<ol>
+  <li>为新对象分配内存（allocate memory for new objects）</li>
+  <li>辨别垃圾对象（identify garbage objects, and）</li>
+  <li>回收内存（reclaim memory from garbage objects.）</li>
+</ol>
+
+<h1 id="reference-counting">Reference Counting</h1>
+
+<p>Python会在创建新对象时实时向系统申请内存。</p>
+
+<p>新的对象创建后，对象内部用<em>reference count</em>记录被引用数，每新增一个引用reference count增加1，反之减少1。当减少到0时，内存被回收。</p>
+
+<blockquote>
+  <p>Just as before, Python sets the reference count in JKL to be 1. However, also notice since we changed n1 to point to JKL, it no longer references ABC, and that Python decremented its reference count down to 0.</p>
+
+  <p>At this point, the Python garbage collector immediately jumps into action! Whenever an object’s reference count reaches zero, Python immediately frees it, returning it’s memory to the operating system:</p>
+</blockquote>
+
+<p><img src="http://patshaughnessy.net/assets/2013/10/24/python6.png" alt="img" /></p>
+
+<p><strong>reference counting的缺点</strong></p>
+
+<ol>
+  <li>需要为每个对象额外增加空间以支持reference count（minor space penalty）。</li>
+  <li>速度更慢。</li>
+  <li>有时候会失效：含有循环结构的数据结构（cyclic data structure）的被引用数永不为0，如下代码所示</li>
+</ol>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Node</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">val</span> <span class="o">=</span> <span class="n">val</span>
+
+<span class="n">n1</span> <span class="o">=</span> <span class="n">Node</span><span class="p">(</span><span class="s">'ABC'</span><span class="p">)</span>  <span class="c1"># refcnt = 1
+</span><span class="n">n2</span> <span class="o">=</span> <span class="n">Node</span><span class="p">(</span><span class="s">'DEF'</span><span class="p">)</span>  <span class="c1"># refcnt = 1
+</span><span class="n">n1</span><span class="o">.</span><span class="nb">next</span> <span class="o">=</span> <span class="n">n2</span>      <span class="c1"># refcnt = 2
+</span><span class="n">n2</span><span class="o">.</span><span class="n">prev</span> <span class="o">=</span> <span class="n">n1</span>      <span class="c1"># refcnt = 2
+</span><span class="n">n1</span> <span class="o">=</span> <span class="bp">None</span>         <span class="c1"># refcnt = 1
+</span><span class="n">n2</span> <span class="o">=</span> <span class="bp">None</span>         <span class="c1"># refcnt = 1
+</span></code></pre></div></div>
+
+<h1 id="generational-garbage-collection">generational garbage collection</h1>
+
+<p>由于Reference counting无法解决循环引用的问题，Python引入了第二个算法：<em>generational garbage collection</em>（约在2.1版本里开始引入）。</p>
+
+<p>Python用一个linked list来追踪被激活的对象，称为<em>Generation Zero</em>。python会逐个对对象检测是否含有相互引用并降低其refcnt。</p>
+
+<h3 id="generation-zeroonetwo">Generation Zero，One，Two</h3>
+
+<p>随程序运行，被占用的资源达到某个阀值时，python的collector被激活，对Generation Zero进行清洗。但并不是全部清除，那些将会被继续使用的对象会被迁移到Generation One。当被占用资源继续上升，到达某个阀值时，类似的过程会发生在Generation One上，“幸存”的对象继续被迁移到Generation Two。</p>
+
+<p>因此，0代的对象会被更频繁地进行清理，2代频率最低。这意味着，约“老”的对象倾向于存活的更久。这种处理办法的根据是Weak Generational Hypothesis。</p>
+
+
+    </article>
+
+    
+    <div class="social-share-wrapper">
+      <div class="social-share"></div>
+    </div>
+    
+  </div>
+
+  <section class="author-detail">
+    <section class="post-footer-item author-card">
+      <div class="avatar">
+        <img src="http://localhost:4000/assets/img/IMG_1744.JPG" alt="">
+      </div>
+      <div class="author-name" rel="author">Chase</div>
+      <div class="bio">
+        <p></p>
+      </div>
+      
+      <ul class="sns-links">
+        
+        <li>
+          <a href="//github.com/jumaok" target="_blank">
+                    <i class="iconfont icon-github"></i>
+                </a>
+        </li>
+        
+      </ul>
+      
+    </section>
+    <section class="post-footer-item read-next">
+      
+
+      
+      <div class="read-next-item">
+        <a href="/2018/10/13/egg-dropping.html" class="read-next-link"></a>
+          <section>
+            <span>Egg Dropping problem</span>
+            <p>假设n个理想的蛋，在一座塔的第k层扔下去会碎掉，n层以下怎么扔都能保持完好状态。怎样用有限的蛋，尽可能快地找出楼层k.</p>
+          </section>
+          
+      </div>
+      
+    </section>
+    
+  </section>
+
+  <footer class="g-footer">
+  <section>Chase ©
+  
+  
+  2018
+  </section>
+  <section>Powered by <a href="//jekyllrb.com">Jekyll</a> | <a href="https://github.com/kaeyleo/jekyll-theme-H2O">Theme H2O</a></section>
+</footer>
+
+
+  <script src="/assets/js/social-share.min.js"></script>
+  <script>
+    socialShare('.social-share', {
+      sites: [
+        
+          'wechat'
+          ,
+          
+        
+          'weibo'
+          ,
+          
+        
+          'douban'
+          ,
+          
+        
+          'twitter'
+          
+        
+      ],
+      wechatQrcodeTitle: "分享到微信朋友圈",
+      wechatQrcodeHelper: '<p>扫码后点击右上角</p><p>将本文分享至朋友圈</p>'
+    });
+  </script>
+
+  
+
+  <script src="/assets/js/prism.js"></script>
+  <script src="/assets/js/index.min.js"></script>
+</body>
+
+</html>

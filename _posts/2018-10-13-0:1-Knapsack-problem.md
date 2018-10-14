@@ -1,9 +1,9 @@
 ---
 layout: post
 title: "0/1 Knapsack problem"
-description: "0/1 Knapsack problem"
 tags: [Algorithms]
 ---
+0/1 Knapsack problem
 
 * 目录
 {:toc .toc}
