@@ -125,9 +125,9 @@ def fetch(self, url):
 
 协程在Python中是基于生成器、Future类、事件循环来实现的。
 
-### `yield` & `yield from`
+### yield & yield from
 
-#### `yield`
+#### yield
 
 在协程中，`yield`通常出现在表达式的右边（例如`datum = yield ...`，如果`yield`后面没有表达式，那么生成器产出`None`）。这时候，调用方可通过`.send(datum)`的方法把值推送给协程，但只能在协程被激活并且处于暂停状态时才能调用`send`：
 
@@ -157,7 +157,7 @@ StopIteration			# 协程终止，抛出StopIteration
 - `generator.throw`，使生成器在暂停的`yield`表达式处抛出指定的异常。如果异常被处理，代码会向前执行到下一个`yield`表达式。TODO 3：如果异常没有被处理，异常会向上冒泡，传到调用方的上下文中。
 - `generator.close`，使生成器在暂停的`yield`表达式处抛出`GeneratorExit`异常。如果生成器没有处理这个异常，或者抛出了`StopIteration`异常，调用方不会报错。
 
-#### `yield from`
+#### yield from
 
 `yield from`是python3.3版本新增的语法。它能够在调用方和子生成器之间建立双向的连接。也就是说，调用方和子生成器可以直接发送和产出值，还可以直接传入异常，而不用在位于中间的协程中添加大量处理异常的代码。
 
@@ -209,7 +209,7 @@ def main(data):
 
 `future`、`task`和`Event loop`都是异步编程中的核心理念。
 
-#### `future`
+#### future
 
 也被称为未来对象，是一个task的返回容器。它的实例表示可能已经完成或者尚未完成的延迟计算。官方文档说它代表的是一个终将由异步操作产生的结果（A Future represents an eventual result of an asynchronous operation. Not thread-safe.）。这与Twisted引擎中的Deferred类，Tornado框架中的Future类，以及多个JavaScript库中的Promise对象类似。
 
@@ -217,7 +217,7 @@ def main(data):
 
 Python有两个Future的类：`concurrent.futures.Future`和`asyncio.Future`。它们的接口基本一致，但实现方法不一样，往后版本可能会统一起来。本文只关注`asyncio.Future`。
 
-#### `task`
+#### task
 
 `Task`是一个被包裹在`Future`的协程（A coroutine wapped in a Future），实际上是`Future`的子类。它充当了Future与协程之间的桥梁，驱动协程前进：如果被包裹的协程`yield from`一个future，task会暂停直到该future完成。
 
@@ -307,7 +307,7 @@ class Fetcher:
 
 *备注：通常情况下都应避免自己创建future，而是交给并发框架去实例化*
 
-#### `Event loop`
+#### Event loop
 
 Event loop，事件循环，是一个程序结构，用于等待和发送消息和事件。可以简单理解为在程序中设置两个线程，一个负责程序运行本身，即“主线程”；另一个负责主线程与其他进程（主要是各种I/O操作）的通信，即“Event loop线程”。每当遇到I/O的时候，主线程就让Event Loop线程去通知相应的I/O程序，然后接着往后运行。等到I/O程序完成操作，Event Loop线程再把结果返回主线程。主线程就调用事先设定的回调函数，完成整个任务。
 
@@ -344,9 +344,58 @@ asyncio.run(asyncio.wait(tasks))	# wait()将由future或协程构成的可迭代
 
 
 
-## Methods
+## APIs
 
-TODO
+## High-level APIs
+
+#### asyncio.create_task(coro)
+
+将协程包裹到一个Task中并返回，会被自动提交到事件循环中以调度其并发的执行时间：
+
+```python
+async def say_after(delay, what):
+    await asyncio.sleep(delay)
+    print(what)
+
+async def main():
+    print(f"started at {time.strftime('%X')}")
+    
+    # await say_after(1, 'hello')
+    # await say_after(2, 'world')
+    
+    task1 = asyncio.create_task(
+        say_after(1, 'hello'))
+
+    task2 = asyncio.create_task(
+        say_after(2, 'world'))
+    
+    await task1		# 两个task都被提交到事件循环
+    await task2		# 执行时间约为2s，比上面被注释掉的方式快1s
+
+    print(f"finished at {time.strftime('%X')}")
+
+asyncio.run(main())
+```
+
+另外，如有需要，task1和task2可以调用`result()`获得`say_after`的返回值。
+
+在3.7以前的版本，`creat_task(coro)`可以用`ensure_future(coro())`代替，这是一个low-level的版本。
+
+
+
+#### asyncio.gather(*aws, loop=None, return_exceptions=False)
+
+aws是awaitable对象。如果aws任何一个都是协程，就会被自动打包成一个Task。这些aws将被并发运行。全部完成后，返回一个包含所有返回值（按顺序排列）的列表。
+
+
+
+#### asyncio.wait(*aws*, ***, *loop=None*, *timeout=None*, *return_when=ALL_COMPLETED*)
+
+类似`gather`，`wait`打包运行aws里的awaitable对象。keyword `return_when`有3个参数可选，默认的ALL_COMPLETED, 另外时FIRST_COMPLETED和FIRST_EXCEPTION。顾名思义，分别会在以下情形返回：全部future完成或取消、第一个future完成或取消和第一个future完成并抛出异常（如无异常则与ALL_COMPLETED一样）。
+
+
+
+## Low-level APIs
 
 
 
