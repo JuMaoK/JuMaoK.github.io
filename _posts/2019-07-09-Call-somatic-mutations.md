@@ -1,11 +1,7 @@
-
-
 ---
 layout: post
 title: "Call somatic mutations"
-
 tags: [GATK, Somatic mutations]
-
 ---
 
 体细胞突变分析
@@ -13,6 +9,7 @@ tags: [GATK, Somatic mutations]
 * 目录
 {:toc .toc}
 ---
+
 
 ## References
 
@@ -50,19 +47,6 @@ gatk Mutect2 \
      --germline-resource af-only-gnomad.vcf.gz \
      --panel-of-normals pon.vcf.gz \
      -O somatic.vcf.gz
-
-# 实际例子
-gatk Mutect2 \
--R ref.fa \
--I tumor.bam \
--I normal.bam \
--normal HCC1143_normal \
--pon resources/chr17_m2pon.vcf.gz \
---germline-resource resources/chr17_af-only-gnomad_grch38.vcf.gz \
---disable-read-filter MateOnSameContigOrNoMappedMateReadFilter \
--L chr17plus.interval_list \
--O 1_somatic_m2.vcf.gz \
--bamout 2_tumor_normal_m2.bam
 ```
 
 - `--germline-resource`: 指定一个代表群体生殖细胞变异位点和频率的文件，用于call体细胞变异前的过滤。人类样本可以用broadinstitute提供的af-only-gnomad.hg38.vcf.gz，非人样本需要自己构建。这个文件与pon都是推荐提供，但缺少了也能跑。如果无法提供，需要指定`--af-of-alleles-not-in-resource `的数值，所有频率低于该数值的变异都会被认为是不可靠的，相当于硬过滤。
@@ -249,8 +233,6 @@ somatic/
     ├── Homo_sapiens_assembly38.fasta
     └── Homo_sapiens_assembly38.fasta.fai
 ```
-
-#### 
 
 ```sh
 # 用样本HG00190、NA19441、HG02759构建PoN
